@@ -1,7 +1,7 @@
 <template>
     <div class="bg">
         <div class="header">
-            <h1 @click="isShowTopBtn = !isShowTopBtn">
+            <h1 @click="toggleTopBtn()">
                 {{ leftRight === 'todo/tobuy' ? 'Monthly Expenditure' : 'To Do / To Buy' }}
             </h1>
             <transition name="page">
@@ -72,7 +72,7 @@
                     </div>
                 </div>
                 <div class="total">
-                    <p @click="isTotal = !isTotal">Total</p>
+                    <p @click="toggleTotel">Total</p>
                     <p>{{ monthTotal }}</p>
                     <div class="keyin" 
                         v-show="isTotal">
@@ -192,69 +192,83 @@
             ? todoBuy.value = 'to buy' : todoBuy.value = 'to do'        
     }    
     const addSubject = (subject) => {
-        if(todoBuy.value === 'to do') { 
-            if(!toDo.value) {
-                localStorage.setItem('todo', '')
-            }   
-            console.log(toDo.value)
-            const newTodo = { 
-                ...toDo.value,
-                [subject]: []
+        if(isClient) {
+            if(todoBuy.value === 'to do') { 
+                if(!toDo.value) {
+                    localStorage.setItem('todo', '')
+                }   
+                console.log(toDo.value)
+                const newTodo = { 
+                    ...toDo.value,
+                    [subject]: []
+                }
+                console.log(newTodo)
+                localStorage.setItem('todo', JSON.stringify(newTodo))
+                toDo.value = JSON.parse(localStorage.getItem('todo'))
+                todoSubject.value = ''
+            } else if (todoBuy.value === 'to buy') {
+                if(!toBuy.value) {
+                    localStorage.setItem('tobuy', '')
+                }   
+                console.log(toBuy.value)
+                const newTobuy = { 
+                    ...toBuy.value,
+                    [subject]: []
+                }
+                console.log(newTobuy)
+                localStorage.setItem('tobuy', JSON.stringify(newTobuy))
+                toBuy.value = JSON.parse(localStorage.getItem('tobuy'))
+                tobuySubject.value = ''        
             }
-            console.log(newTodo)
-            localStorage.setItem('todo', JSON.stringify(newTodo))
-            toDo.value = JSON.parse(localStorage.getItem('todo'))
-            todoSubject.value = ''
-        } else if (todoBuy.value === 'to buy') {
-            if(!toBuy.value) {
-                localStorage.setItem('tobuy', '')
-            }   
-            console.log(toBuy.value)
-            const newTobuy = { 
-                ...toBuy.value,
-                [subject]: []
-            }
-            console.log(newTobuy)
-            localStorage.setItem('tobuy', JSON.stringify(newTobuy))
-            toBuy.value = JSON.parse(localStorage.getItem('tobuy'))
-            tobuySubject.value = ''        
         }
     }
     const addItem = (subject, item) => {
-        if(todoBuy.value === 'to do') {
-            toDo.value[subject].push(item)
-            console.log(toDo.value, toDo.value[subject], subject, item)            
-            localStorage.setItem('todo', JSON.stringify(toDo.value ))
-            todoItem.value[subject] = ''
-        } else if(todoBuy.value === 'to buy') {
-            toBuy.value[subject].push(item)                     
-            localStorage.setItem('tobuy', JSON.stringify(toBuy.value))
-            tobuyItem.value[subject] = ''
+        if(isClient) {
+            if(todoBuy.value === 'to do') {
+                toDo.value[subject].push(item)
+                console.log(toDo.value, toDo.value[subject], subject, item)            
+                localStorage.setItem('todo', JSON.stringify(toDo.value ))
+                todoItem.value[subject] = ''
+            } else if(todoBuy.value === 'to buy') {
+                toBuy.value[subject].push(item)                     
+                localStorage.setItem('tobuy', JSON.stringify(toBuy.value))
+                tobuyItem.value[subject] = ''
+            }
         }
     }
     const toggleItem = (item) => {
-        if(todoBuy.value === 'to do') {
-            if(todoItem.value[item] === undefined) todoItem.value[item] = false
-            todoItem.value[item] = !todoItem.value[item]
-        } else if (todoBuy.value === 'to buy') {            
-            if(tobuyItem.value[item] === undefined) tobuyItem.value[item] = false
-            tobuyItem.value[item] = !tobuyItem.value[item]
+        if(isClient) {
+            if(todoBuy.value === 'to do') {
+                if(todoItem.value[item] === undefined) todoItem.value[item] = false
+                todoItem.value[item] = !todoItem.value[item]
+            } else if (todoBuy.value === 'to buy') {            
+                if(tobuyItem.value[item] === undefined) tobuyItem.value[item] = false
+                tobuyItem.value[item] = !tobuyItem.value[item]
+            }
         }
     }
     const deleteSubject = (subject) => {
-        if(todoBuy.value === 'to do') {                         
-            const newTodo = Object.fromEntries(
-                Object.entries(toDo.value).filter(([key, value]) => key !== subject )
-            )
-            localStorage.setItem('todo', JSON.stringify(newTodo))
-            toDo.value = JSON.parse(localStorage.getItem('todo'))            
-        } else if(todoBuy.value === 'to buy') {                         
-            const newTobuy = Object.fromEntries(
-                Object.entries(toBuy.value).filter(([key, value]) => key !== subject )
-            )
-            localStorage.setItem('tobuy', JSON.stringify(newTobuy))
-            toBuy.value = JSON.parse(localStorage.getItem('tobuy'))            
+        if(isClient) {
+            if(todoBuy.value === 'to do') {                         
+                const newTodo = Object.fromEntries(
+                    Object.entries(toDo.value).filter(([key, value]) => key !== subject )
+                )
+                localStorage.setItem('todo', JSON.stringify(newTodo))
+                toDo.value = JSON.parse(localStorage.getItem('todo'))            
+            } else if(todoBuy.value === 'to buy') {                         
+                const newTobuy = Object.fromEntries(
+                    Object.entries(toBuy.value).filter(([key, value]) => key !== subject )
+                )
+                localStorage.setItem('tobuy', JSON.stringify(newTobuy))
+                toBuy.value = JSON.parse(localStorage.getItem('tobuy'))            
+            }
         }
+    }
+    const toggleTopBtn = () => {
+        isShowTopBtn = !isShowTopBtn
+    }
+    const toggleTotel = () => {
+        isTotal = !isTotal
     }
     //expenditure
     const isTotal = ref(false)
@@ -264,59 +278,69 @@
     const monthTotal = ref(null)
     const currentTotal = ref(null)
     const setTotal = () => {
-        localStorage.setItem('total', txtTotal.value)
-        localStorage.removeItem('expenses')
-        localStorage.removeItem('once')
+        if(isClient) {
+            localStorage.setItem('total', txtTotal.value)
+            localStorage.removeItem('expenses')
+            localStorage.removeItem('once')
+        }
     }
     const spend = (num) => {
-        monthTotal.value -= num
-        console.log(monthTotal.value)
-        localStorage.setItem('total', monthTotal.value)
-        console.log(localStorage.getItem('total'))
+        if(isClient) {
+            monthTotal.value -= num
+            console.log(monthTotal.value)
+            localStorage.setItem('total', monthTotal.value)
+            console.log(localStorage.getItem('total'))
+        }
     }
     const addExpSub = () => {
-        if(!currentTotal.value) {
-            localStorage.setItem('expenses', '')
-            currentTotal.value = {}
-            console.log(currentTotal.value)
-        }
-        if(!currentTotal.value.hasOwnProperty(txtSubject.value)) {            
-            const newExp = { 
-                ...currentTotal.value,
-                [txtSubject.value]: []
+        if(isClient) {
+            if(!currentTotal.value) {
+                localStorage.setItem('expenses', '')
+                currentTotal.value = {}
+                console.log(currentTotal.value)
             }
-            console.log(newExp)
-            currentTotal.value = newExp
-            txtSubject.value = ''
-            localStorage.setItem('expenses', JSON.stringify(newExp))            
-        } else {
-            alert('Subject existed')
+            if(!currentTotal.value.hasOwnProperty(txtSubject.value)) {            
+                const newExp = { 
+                    ...currentTotal.value,
+                    [txtSubject.value]: []
+                }
+                console.log(newExp)
+                currentTotal.value = newExp
+                txtSubject.value = ''
+                localStorage.setItem('expenses', JSON.stringify(newExp))            
+            } else {
+                alert('Subject existed')
+            }
         }
     }
     const addSpending = (subject) => {
-        currentTotal.value[subject].push(txtExpense.value[subject])
-        localStorage.setItem('expenses', JSON.stringify(currentTotal.value))
-        spend(txtExpense.value[subject])
-        txtExpense.value[subject] = null        
+        if(isClient) {
+            currentTotal.value[subject].push(txtExpense.value[subject])
+            localStorage.setItem('expenses', JSON.stringify(currentTotal.value))
+            spend(txtExpense.value[subject])
+            txtExpense.value[subject] = null        
+        }
     }
     //once    
     const onceName = ref(null)
     const onceNum = ref(null)
     const onceGroup = ref(null)
     const addOnce = () => {
-        if(!onceGroup.value) {
-            localStorage.setItem('once', '')
-            onceGroup.value = {}
-        }
-        if(!onceGroup.value.hasOwnProperty(onceName.value)) {
-            onceGroup.value = {
-                ...onceGroup.value, 
-                [onceName.value]: onceNum.value
+        if(isClient) {
+            if(!onceGroup.value) {
+                localStorage.setItem('once', '')
+                onceGroup.value = {}
             }
-            spend(onceNum.value)
-            onceName.value = null
-            onceNum.value = null
-            localStorage.setItem('once', JSON.stringify(onceGroup.value))
+            if(!onceGroup.value.hasOwnProperty(onceName.value)) {
+                onceGroup.value = {
+                    ...onceGroup.value, 
+                    [onceName.value]: onceNum.value
+                }
+                spend(onceNum.value)
+                onceName.value = null
+                onceNum.value = null
+                localStorage.setItem('once', JSON.stringify(onceGroup.value))
+            }
         }
     }
     onMounted(() => {
